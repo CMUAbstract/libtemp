@@ -1,4 +1,5 @@
 #include <msp430.h>
+#include <libmsp/periph.h>
 
 #include "temp.h"
 
@@ -15,7 +16,6 @@ float temp_sample() {
 
   while( REFCTL0 & REFGENBUSY );
 
-  //REFCTL0 = REFVSEL_0 | REFON; // 1.2V reference (<= 70 degC)
   REFCTL0 = REF(LIBTEMP_REF_BITS) | REFON;
 
   // Wait for REF to settle
