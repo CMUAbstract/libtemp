@@ -1,11 +1,13 @@
 #include <msp430.h>
 #include <libmsp/periph.h>
+#include <stdint.h>
 
 #include "temp.h"
 
+#define FP 10 // fixed-point fractional part
 #define ADC_SCALE 4096
 
-float temp_sample() {
+int temp_sample() {
   ADC12CTL0 &= ~ADC12ENC;           // Disable conversions
 
   ADC12CTL3 |= ADC12TCMAP;
@@ -34,8 +36,7 @@ float temp_sample() {
   ADC12CTL0 &= ~(ADC12ON);  // Shutdown ADC12
   REFCTL0 &= ~REFON;
 
-  float tempV = ((float)(sample) * LIBTEMP_REF / ADC_SCALE + 0.5 * LIBTEMP_REF / ADC_SCALE);
-  float tempC = (tempV - LIBTEMP_INTERCEPT)  * LIBTEMP_SLOPE_INVERSE;
+  int tempC = ((int32_t)sample * LIBTEMP_ADC_CONV_FACTOR * FP / ADC_SCALE) - LIBTEMP_ADC_CONV_OFFSET * FP;
 
   return tempC;
 }
